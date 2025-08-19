@@ -24,12 +24,22 @@ namespace app{
 		}
 	}
 
+	void AppWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+	{
+		auto appWindow = reinterpret_cast<AppWindow*>(glfwGetWindowUserPointer(window));
+		appWindow->frameBufferResized = true;
+		appWindow->width = width;
+		appWindow->height = height;
+	}
+
 	void AppWindow::initWindow() {
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		window = glfwCreateWindow(width, height, windowname.c_str(), nullptr, nullptr);
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 	}
 }
 
