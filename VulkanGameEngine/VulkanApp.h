@@ -35,10 +35,12 @@ namespace app {
 		void createPipeline();
 		void createCommandBuffer();
 		void drawFrame();
+		void recreateSwapChain();
+		void recordCommandBuffer(int imageIndex);
 
 		AppWindow appWindow{ WIDTH, HEIGHT, "Vulkan Game Engine" };
 		EngineDevice engineDevice{ appWindow };
-		EngineSwapChain swapChain{ engineDevice, appWindow.getExtent()};
+		std::unique_ptr<EngineSwapChain> swapChain;
 		std::unique_ptr<AppPipeline> appPipeline;
 
 		VkPipelineLayout pipelineLayout;
