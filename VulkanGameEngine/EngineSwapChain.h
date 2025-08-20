@@ -8,6 +8,7 @@
 // std lib headers
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace app {
 
@@ -16,6 +17,8 @@ namespace app {
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
         EngineSwapChain(EngineDevice& deviceRef, VkExtent2D windowExtent);
+        EngineSwapChain(EngineDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<EngineSwapChain> previous);
+
         ~EngineSwapChain();
 
         EngineSwapChain(const EngineSwapChain&) = delete;
@@ -39,6 +42,7 @@ namespace app {
         VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
     private:
+        void init();
         void createSwapChain();
         void createImageViews();
         void createDepthResources();
@@ -53,6 +57,7 @@ namespace app {
             const std::vector<VkPresentModeKHR>& availablePresentModes);
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+        std::shared_ptr<EngineSwapChain> oldSwapChain;
         VkFormat swapChainImageFormat;
         VkExtent2D swapChainExtent;
 

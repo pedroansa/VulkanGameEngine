@@ -34,6 +34,7 @@ namespace app {
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffer();
+		void freeCommandBuffer();
 		void drawFrame();
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);

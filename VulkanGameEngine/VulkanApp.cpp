@@ -47,6 +47,8 @@ namespace app {
 
 	void VulkanApp::createPipeline()
 	{
+		assert(swapChain != nullptr && "Cannot create pipeline before swapChain");
+		assert(pipelineLayout != nullptr && "Cannot create pipeline before layour");
 		PipelineConfigInfo pipelineConfig{};
 		AppPipeline::defaultPipelineConfigInfo(
 			pipelineConfig);
@@ -73,6 +75,15 @@ namespace app {
 			VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate command buffers!");
 		}
+	}
+
+	void VulkanApp::freeCommandBuffer()
+	{
+		vkFreeCommandBuffers(
+			engineDevice.device(),
+			engineDevice.getCommandPool(),
+			static_cast<uint32_t>(commandBuffers.size()),
+			commandBuffers.data());
 	}
 
 	void VulkanApp::recordCommandBuffer(int imageIndex) {
@@ -159,7 +170,16 @@ namespace app {
 		}
 		vkDeviceWaitIdle(engineDevice.device());
 
-		swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);
+		if (swapChain == nullptr) {
+			swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);
+		}
+		else {
+			swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, std::move(swapChain));
+			if (swapChain->imageCount() != commandBuffers.size()) {
+				freeCommandBuffer();
+				createCommandBuffer();
+			}
+		}
 		createPipeline();
 	}
 
