@@ -47,8 +47,9 @@ namespace app {
 
 	void VulkanApp::createPipeline()
 	{
-		auto pipelineConfig =
-			AppPipeline::defaultPipelineConfigInfo(swapChain->width(), swapChain->height());
+		PipelineConfigInfo pipelineConfig{};
+		AppPipeline::defaultPipelineConfigInfo(
+			pipelineConfig);
 		pipelineConfig.renderPass = swapChain->getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		appPipeline = std::make_unique<AppPipeline>(
@@ -98,6 +99,18 @@ namespace app {
 		renderPassInfo.pClearValues = clearValues.data();
 
 		vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapChain->getSwapChainExtent().width);
+		viewport.height = static_cast<float>(swapChain->getSwapChainExtent().height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		VkRect2D scissor{ {0, 0}, swapChain->getSwapChainExtent() };
+		vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
+		vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
+
 
 		appPipeline->bind(commandBuffers[imageIndex]);
 		model->bind(commandBuffers[imageIndex]);
