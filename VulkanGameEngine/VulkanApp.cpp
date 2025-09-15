@@ -3,13 +3,14 @@
 namespace app {
 
 	struct SimplePushConstantData {
+		glm::mat2 transform{1.f};
 		glm::vec2 offset;
 		alignas(16) glm::vec3 color;
 	};
 
 	VulkanApp::VulkanApp()
 	{
-		loadModels();
+		loadGameObjects();
 		createPipelineLayout();
 		recreateSwapChain();
 		createCommandBuffer();
@@ -27,7 +28,7 @@ namespace app {
 
 		vkDeviceWaitIdle(engineDevice.device());
 	}
-	void VulkanApp::loadModels()
+	void VulkanApp::loadGameObjects()
 	{
 		std::vector<Model::Vertex> vertices{
 			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -35,7 +36,14 @@ namespace app {
 			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
 		//sierpinski(vertices, 5, { -0.5f, 0.5f }, { 0.5f, 0.5f }, { 0.0f, -0.5f });
 
-		model = std::make_unique<Model>(engineDevice, vertices);
+		auto model = std::make_shared<Model>(engineDevice, vertices);
+		auto triangle = GameObject::createGameObject();
+		triangle.model = model;
+		triangle.color = { .1f, .8f, .1f };
+		triangle.transform2d.translation.x = .2f;
+		triangle.transform2d.scale = { 2.f, .5f };
+		triangle.transform2d.rotation = .25f * glm::two_pi<float>();
+		gameObjects.push_back(std::move(triangle));
 	}
 	void VulkanApp::createPipelineLayout()
 	{
@@ -99,9 +107,6 @@ namespace app {
 
 	void VulkanApp::recordCommandBuffer(int imageIndex) {
 		
-		static int frame = 30;
-		frame = (frame + 1) % 100;
-
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -137,32 +142,37 @@ namespace app {
 		vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
 
-		appPipeline->bind(commandBuffers[imageIndex]);
-		model->bind(commandBuffers[imageIndex]);
-
-		for (int j = 0; j < 4; j++) {
-			SimplePushConstantData push{};
-			push.offset = { -0.5f + 0.02f * frame , -0.4f + j * 0.25f };
-			push.color = { 1.0f, 0.0f, 0.2f + 0.2f * j };
-
-			vkCmdPushConstants(
-				commandBuffers[imageIndex],
-				pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				0,
-				sizeof(SimplePushConstantData),
-				&push);
-			model->draw(commandBuffers[imageIndex]);
-
-		}
-		//model->draw(commandBuffers[imageIndex]);
-		// vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+		renderGameObjects(commandBuffers[imageIndex]);
 
 		vkCmdEndRenderPass(commandBuffers[imageIndex]);
 		if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
 			throw std::runtime_error("failed to record command buffer!");
 		}
 		
+	}
+	void VulkanApp::renderGameObjects(VkCommandBuffer commandBuffer)
+	{
+		appPipeline->bind(commandBuffer);
+
+		for (auto& obj : gameObjects) {
+			obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+			SimplePushConstantData push{};
+			push.offset = obj.transform2d.translation;
+			push.color = obj.color;
+			push.transform = obj.transform2d.mat2();
+
+			vkCmdPushConstants(
+				commandBuffer,
+				pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(SimplePushConstantData),
+				&push);
+			
+			obj.model->bind(commandBuffer);
+			obj.model->draw(commandBuffer);
+
+		}
 	}
 	void VulkanApp::drawFrame()
 	{
