@@ -3,6 +3,7 @@
 #include "AppPipeline.h"
 #include "EngineDevice.h"
 #include "EngineSwapChain.h"
+#include "GameObject.h"
 #include <memory>
 #include <vector>
 #include <array>
@@ -10,6 +11,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 namespace app {
 	class VulkanApp
@@ -32,7 +34,7 @@ namespace app {
 		void run();
 
 	private:
-		void loadModels();
+		void loadGameObjects();
 		void sierpinski(std::vector<Model::Vertex>& vertices,
 			int depth,
 			glm::vec2 left,
@@ -46,6 +48,7 @@ namespace app {
 		void drawFrame();
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
+		void renderGameObjects(VkCommandBuffer commandBuffer);
 
 		AppWindow appWindow{ WIDTH, HEIGHT, "Vulkan Game Engine" };
 		EngineDevice engineDevice{ appWindow };
@@ -54,7 +57,7 @@ namespace app {
 
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
-		std::unique_ptr<Model> model;
+		std::vector<GameObject> gameObjects;
 	};
 }
 
