@@ -2,7 +2,7 @@
 #include "AppWindow.h"
 #include "AppPipeline.h"
 #include "EngineDevice.h"
-#include "EngineSwapChain.h"
+#include "AppRenderer.h"
 #include "GameObject.h"
 #include <memory>
 #include <vector>
@@ -43,20 +43,14 @@ namespace app {
 
 		void createPipelineLayout();
 		void createPipeline();
-		void createCommandBuffer();
-		void freeCommandBuffer();
-		void drawFrame();
-		void recreateSwapChain();
-		void recordCommandBuffer(int imageIndex);
 		void renderGameObjects(VkCommandBuffer commandBuffer);
 
 		AppWindow appWindow{ WIDTH, HEIGHT, "Vulkan Game Engine" };
 		EngineDevice engineDevice{ appWindow };
-		std::unique_ptr<EngineSwapChain> swapChain;
-		std::unique_ptr<AppPipeline> appPipeline;
+		AppRenderer appRenderer{ appWindow, engineDevice };
 
+		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
-		std::vector<VkCommandBuffer> commandBuffers;
 		std::vector<GameObject> gameObjects;
 	};
 }
