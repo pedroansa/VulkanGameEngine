@@ -13,7 +13,7 @@ namespace app {
 
 	void AppRenderer::createCommandBuffer()
 	{
-		commandBuffers.resize(swapChain->imageCount());
+		commandBuffers.resize(EngineSwapChain::MAX_FRAMES_IN_FLIGHT );
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -54,11 +54,6 @@ namespace app {
 
 			if (!oldSwapChain->compareSwapFormats(*swapChain.get())) {
 				throw std::runtime_error("SwapChain image or depth format has change");
-			}
-
-			if (swapChain->imageCount() != commandBuffers.size()) {
-				freeCommandBuffer();
-				createCommandBuffer();
 			}
 		}
 		// TO DO CREATE PIPELINE
@@ -110,6 +105,8 @@ namespace app {
 		}
 
 		isFrameStarted = false;
+
+		currentFrameIndex = (currentFrameIndex + 1) % EngineSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 	void AppRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 		assert(isFrameStarted && "Cannot call beginSwapChainRenderPass if frame is in progress");

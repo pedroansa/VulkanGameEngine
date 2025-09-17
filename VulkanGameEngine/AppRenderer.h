@@ -20,7 +20,13 @@ namespace app {
 		bool isFrameInProgress() const { return isFrameStarted; }
 		VkCommandBuffer getCurrentCommandBuffer() const { 
 			assert(isFrameStarted && "Cannot get commandBuffer if frame is not in progress");
-			return commandBuffers[currentImageIndex]; }
+			return commandBuffers[currentFrameIndex]; }
+
+		int getCurrentFrameIndex() const {
+			assert(isFrameStarted && "Cannot get frame index if frame is not in progress");
+			return currentFrameIndex;
+		}
+
 		VkRenderPass getSwapChainRenderPass() const{ return swapChain->getRenderPass(); }
 
 		VkCommandBuffer beginFrame();
@@ -40,6 +46,7 @@ namespace app {
 		std::vector<VkCommandBuffer> commandBuffers;
 
 		uint32_t currentImageIndex;
+		int currentFrameIndex;
 		bool isFrameStarted;
 	};
 }
