@@ -1,9 +1,9 @@
 #pragma once
 #include "AppWindow.h"
-#include "AppPipeline.h"
 #include "EngineDevice.h"
 #include "AppRenderer.h"
 #include "GameObject.h"
+#include "InitialRenderSystem.h"
 #include <memory>
 #include <vector>
 #include <array>
@@ -41,16 +41,10 @@ namespace app {
 			glm::vec2 right,
 			glm::vec2 top);
 
-		void createPipelineLayout();
-		void createPipeline();
-		void renderGameObjects(VkCommandBuffer commandBuffer);
-
 		AppWindow appWindow{ WIDTH, HEIGHT, "Vulkan Game Engine" };
 		EngineDevice engineDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, engineDevice };
 
-		std::unique_ptr<AppPipeline> appPipeline;
-		VkPipelineLayout pipelineLayout;
 		std::vector<GameObject> gameObjects;
 	};
 }
