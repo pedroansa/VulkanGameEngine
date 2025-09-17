@@ -24,6 +24,10 @@ namespace app {
         EngineSwapChain(const EngineSwapChain&) = delete;
         EngineSwapChain& operator=(const EngineSwapChain&) = delete;
 
+        bool compareSwapFormats(const EngineSwapChain& swapChain) const {
+            return swapChain.swapChainImageFormat == swapChainImageFormat && swapChain.swapChainDepthFormat == swapChainDepthFormat;
+        }
+
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() { return renderPass; }
         VkImageView getImageView(int index) { return swapChainImageViews[index]; }
@@ -59,6 +63,8 @@ namespace app {
 
         std::shared_ptr<EngineSwapChain> oldSwapChain;
         VkFormat swapChainImageFormat;
+        VkFormat swapChainDepthFormat;
+         
         VkExtent2D swapChainExtent;
 
         std::vector<VkFramebuffer> swapChainFramebuffers;

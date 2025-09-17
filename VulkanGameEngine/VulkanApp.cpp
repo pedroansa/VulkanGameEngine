@@ -6,7 +6,9 @@ namespace app {
 	{
 		loadGameObjects();
 	}
+
 	VulkanApp::~VulkanApp(){}
+
 	void VulkanApp::run()
 	{
 		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass() };

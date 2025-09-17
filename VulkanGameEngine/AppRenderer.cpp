@@ -49,7 +49,13 @@ namespace app {
 			swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);
 		}
 		else {
-			swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, std::move(swapChain));
+			std::shared_ptr<EngineSwapChain> oldSwapChain = std::move(swapChain);
+			swapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, oldSwapChain);
+
+			if (!oldSwapChain->compareSwapFormats(*swapChain.get())) {
+				throw std::runtime_error("SwapChain image or depth format has change");
+			}
+
 			if (swapChain->imageCount() != commandBuffers.size()) {
 				freeCommandBuffer();
 				createCommandBuffer();
