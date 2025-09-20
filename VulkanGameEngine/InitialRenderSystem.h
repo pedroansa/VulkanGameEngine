@@ -9,10 +9,11 @@
 namespace app {
 	class InitialRenderSystem
 	{
-		struct SimplePushConstants {
-			glm::vec2 offset;
-			glm::vec2 color;
+		struct SimplePushConstantData {
+			glm::mat4 transform{ 1.f };
+			alignas(16) glm::vec3 color;
 		};
+
 
 	public: 
 
