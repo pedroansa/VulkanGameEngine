@@ -45,7 +45,7 @@ namespace app {
 			"shaders/frag.spv",
 			pipelineConfig);
 	}
-	void InitialRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects)
+	void InitialRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera &camera)
 	{
 		// Render
 		appPipeline->bind(commandBuffer);
@@ -56,7 +56,7 @@ namespace app {
 
 			SimplePushConstantData push{};
 			push.color = obj.color;
-			push.transform = obj.transform.mat4();
+			push.transform = camera.getProjection() * obj.transform.mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,

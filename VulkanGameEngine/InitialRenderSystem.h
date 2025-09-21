@@ -2,6 +2,7 @@
 #include "AppPipeline.h"
 #include "EngineDevice.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include <memory>
 #include <vector>
 #include <array>
@@ -23,15 +24,10 @@ namespace app {
 		InitialRenderSystem(const InitialRenderSystem&) = delete;
 		InitialRenderSystem& operator=(const InitialRenderSystem&) = delete;
 
-		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>&  gameObjects);
+		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>&  gameObjects, const Camera &camera);
 
 
 	private:
-		void sierpinski(std::vector<Model::Vertex>& vertices,
-			int depth,
-			glm::vec2 left,
-			glm::vec2 right,
-			glm::vec2 top);
 
 		void createPipelineLayout();
 		void createPipeline(VkRenderPass& renderPass);
