@@ -11,13 +11,19 @@ namespace app {
 
 	void VulkanApp::run()
 	{
+		Camera camera{};
+
 		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass() };
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
 
+			float aspect = appRenderer.getAspectRatio();
+			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+			camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
+
 			if (auto commandBuffer = appRenderer.beginFrame()) {
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
-				initialRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+				initialRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 
@@ -91,7 +97,7 @@ namespace app {
 
 		auto cube = GameObject::createGameObject();
 		cube.model = cubeModel;
-		cube.transform.translation = { .0f, .0f, .5f };
+		cube.transform.translation = { .0f, .0f, 2.5f };
 		cube.transform.scale = { .5f, .5f, .5f };
 		gameObjects.push_back(std::move(cube));
 	}

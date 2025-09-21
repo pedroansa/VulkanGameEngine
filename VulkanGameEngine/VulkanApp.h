@@ -3,6 +3,7 @@
 #include "EngineDevice.h"
 #include "AppRenderer.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include "InitialRenderSystem.h"
 #include <memory>
 #include <vector>

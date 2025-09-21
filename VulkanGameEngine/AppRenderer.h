@@ -27,6 +27,7 @@ namespace app {
 			return currentFrameIndex;
 		}
 
+		float getAspectRatio() const { return swapChain->extentAspectRatio(); }
 		VkRenderPass getSwapChainRenderPass() const{ return swapChain->getRenderPass(); }
 
 		VkCommandBuffer beginFrame();
