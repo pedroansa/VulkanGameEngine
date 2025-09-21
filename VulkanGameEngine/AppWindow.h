@@ -16,6 +16,7 @@ namespace app {
 		AppWindow& operator=(const AppWindow&) = delete;
 
 		VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; };
+		GLFWwindow* getGLFWwindow() const { return window; }
 
 		bool shouldClose();
 		bool wasWindowResized() { return frameBufferResized; };
