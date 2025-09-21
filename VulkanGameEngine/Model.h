@@ -17,7 +17,12 @@ namespace app {
 
 		};
 
-		Model(EngineDevice& device, const std::vector<Vertex>& vertices);
+		struct ModelBuilder {
+			std::vector<Model::Vertex> vertices{};
+			std::vector<uint32_t> indices{};
+		};
+
+		Model(EngineDevice& device, const ModelBuilder& builder);
 		~Model();
 
 		Model(const Model&) = delete;
@@ -28,11 +33,19 @@ namespace app {
 
 	private:
 		void createVertexBuffers(const std::vector<Vertex>& vertices);
+		void createIndexBuffers(const std::vector<uint32_t>& indices);
+
 
 		EngineDevice& appDevice;
+
 		VkBuffer vertexBuffer;
 		VkDeviceMemory vertexBufferMemory;
 		uint32_t vertexCount;
+
+		bool hasIndexBuffer = false;
+		VkBuffer indexBuffer;
+		VkDeviceMemory indexBufferMemory;
+		uint32_t indexCount;
 	};
 }
 
