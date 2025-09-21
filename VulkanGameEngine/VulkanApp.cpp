@@ -1,4 +1,5 @@
 #include "VulkanApp.h"
+#include <iostream>
 
 namespace app {
 
@@ -12,12 +13,23 @@ namespace app {
 	void VulkanApp::run()
 	{
 		Camera camera{};
-		//camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
-		camera.setViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
+		auto viewerObject = GameObject::createGameObject();
+
+		KeyboardController controler{};
+
+		auto currentTime = std::chrono::high_resolution_clock::now();
 
 		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass() };
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
+
+			auto newTime = std::chrono::high_resolution_clock::now();
+			float frameTime =
+				std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+			currentTime = newTime;
+
+			controler.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTime, viewerObject);
+			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 			float aspect = appRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
