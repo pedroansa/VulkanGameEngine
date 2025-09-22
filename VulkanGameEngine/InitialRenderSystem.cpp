@@ -56,8 +56,9 @@ namespace app {
 			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());*/
 
 			SimplePushConstantData push{};
-			push.color = obj.color;
-			push.transform = projectionView * obj.transform.mat4();
+			auto modelMatrix = obj.transform.mat4();
+			push.transform = projectionView * modelMatrix;
+			push.modelMatrix = modelMatrix;
 
 			vkCmdPushConstants(
 				commandBuffer,
