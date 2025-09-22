@@ -8,6 +8,58 @@
 namespace app {
 	struct PipelineConfigInfo {
 
+        PipelineConfigInfo() {
+            // Inicializa todas as structs Vulkan com zeros e define seus sTypes
+            viewportinfo = {};
+            viewportinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+
+            inputAssemblyInfo = {};
+            inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+
+            rasterizationInfo = {};
+            rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+
+            multisampleInfo = {};
+            multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+
+            colorBlendAttachment = {};
+
+            colorBlendInfo = {};
+            colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+
+            depthStencilInfo = {};
+            depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+
+            dynamicStateInfo = {};
+            dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+
+            // Configurações padrão importantes
+            inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+            inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+
+            rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+            rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+            rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+            rasterizationInfo.lineWidth = 1.0f;
+
+            multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+            colorBlendAttachment.colorWriteMask =
+                VK_COLOR_COMPONENT_R_BIT |
+                VK_COLOR_COMPONENT_G_BIT |
+                VK_COLOR_COMPONENT_B_BIT |
+                VK_COLOR_COMPONENT_A_BIT;
+            colorBlendAttachment.blendEnable = VK_FALSE;
+
+            colorBlendInfo.attachmentCount = 1;
+            colorBlendInfo.pAttachments = &colorBlendAttachment;
+
+            // Configurações padrão para dynamic state
+            dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+            dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+            dynamicStateInfo.pDynamicStates = dynamicStateEnables.data();
+        }
+
 		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
