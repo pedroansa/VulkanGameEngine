@@ -100,12 +100,18 @@ namespace app {
 	void VulkanApp::loadGameObjects()
 	{
 		std::shared_ptr<Model> model = Model::createModelFromFile(engineDevice, "models/smooth_vase.obj");
+		auto smooth_vase = GameObject::createGameObject();
+		smooth_vase.model = model;
+		smooth_vase.transform.translation = { .0f, .0f, 2.5f };
+		smooth_vase.transform.scale = { 3.f, 3.f, 3.f };
+		gameObjects.push_back(std::move(smooth_vase));
 
-		auto gameObject = GameObject::createGameObject();
-		gameObject.model = model;
-		gameObject.transform.translation = { .0f, .0f, 2.5f };
-		gameObject.transform.scale = { .5f, .5f, .5f };
-		gameObjects.push_back(std::move(gameObject));
+		model = Model::createModelFromFile(engineDevice, "models/flat_vase.obj");
+		auto flat_vase = GameObject::createGameObject();
+		flat_vase.model = model;
+		flat_vase.transform.translation = { 2.0f, .0f, 2.5f };
+		flat_vase.transform.scale = { 3.f, 3.f, 3.f };
+		gameObjects.push_back(std::move(flat_vase));
 	}
 
 }
