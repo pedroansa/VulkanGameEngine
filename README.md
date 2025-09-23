@@ -1,5 +1,7 @@
 # Vulkan Game Engine
 
+![Engine Screenshot](screenshot.png)
+
 A simple 3D game engine built with Vulkan and GLFW in C++. This project serves as a learning implementation of modern graphics programming using the Vulkan API.
 
 ## Features
