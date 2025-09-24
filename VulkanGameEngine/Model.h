@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include "EngineDevice.h"
+#include "AppBuffer.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -49,13 +50,11 @@ namespace app {
 
 		EngineDevice& appDevice;
 
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
+		std::unique_ptr<AppBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		std::unique_ptr<AppBuffer> indexBuffer;
 		uint32_t indexCount;
 	};
 }

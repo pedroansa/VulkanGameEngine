@@ -14,6 +14,10 @@ namespace app {
 	{
 		Camera camera{};
 		auto viewerObject = GameObject::createGameObject();
+		viewerObject.transform.translation = { -500.f, -1.0f, 2.0f };
+		glm::vec3 directionToOrigin = glm::normalize(glm::vec3(0.0f) - viewerObject.transform.translation);
+		viewerObject.transform.rotation.y = atan2(directionToOrigin.x, directionToOrigin.z); // yaw
+		viewerObject.transform.rotation.x = asin(-directionToOrigin.y); // pitch
 
 		KeyboardController controler{};
 
@@ -33,7 +37,7 @@ namespace app {
 
 			float aspect = appRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-			camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
+			camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 1000.f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
@@ -102,17 +106,17 @@ namespace app {
 		std::shared_ptr<Model> model = Model::createModelFromFile(engineDevice, "models/face.obj");
 		auto smooth_vase = GameObject::createGameObject();
 		smooth_vase.model = model;
-		smooth_vase.transform.translation = {2.0f, .0f, 2.5f };
-		smooth_vase.transform.rotation = { -10.0f, 0.0f, 1.f };
-		smooth_vase.transform.scale = { 0.01f, 0.01f, 0.01f };
+		smooth_vase.transform.translation = {0.0f, .0f, 0.0f };
+		smooth_vase.transform.rotation = { 0.0f, 0.0f, 2.5f };
+		smooth_vase.transform.scale = { 1.f, 1.f, 1.f };
 		gameObjects.push_back(std::move(smooth_vase));
 
 		model = Model::createModelFromFile(engineDevice, "models/flat_vase.obj");
 		auto flat_vase = GameObject::createGameObject();
 		flat_vase.model = model;
-		flat_vase.transform.translation = { 2.0f, .0f, 2.5f };
-		flat_vase.transform.scale = { 3.f, 3.f, 3.f };
-		//gameObjects.push_back(std::move(flat_vase));
+		flat_vase.transform.translation = { 300.0f, .0f, 2.5f };
+		flat_vase.transform.scale = { 300.f, 300.f, 300.f };
+		gameObjects.push_back(std::move(flat_vase));
 	}
 
 }

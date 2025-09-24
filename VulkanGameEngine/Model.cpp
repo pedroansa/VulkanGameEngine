@@ -27,13 +27,6 @@ app::Model::Model(EngineDevice& device, const ModelBuilder& builder) : appDevice
 
 app::Model::~Model()
 {
-    vkDestroyBuffer(appDevice.device(), vertexBuffer, nullptr);
-    vkFreeMemory(appDevice.device(), vertexBufferMemory, nullptr);
-
-    if (hasIndexBuffer) {
-        vkDestroyBuffer(appDevice.device(), indexBuffer, nullptr);
-        vkFreeMemory(appDevice.device(), indexBufferMemory, nullptr);
-    }
 }
 
 std::unique_ptr<app::Model> app::Model::createModelFromFile(EngineDevice& device, const std::string& filePath)
@@ -46,12 +39,12 @@ std::unique_ptr<app::Model> app::Model::createModelFromFile(EngineDevice& device
 
 void app::Model::bind(VkCommandBuffer commandBuffer)
 {
-    VkBuffer buffers[] = { vertexBuffer };
+    VkBuffer buffers[] = { vertexBuffer->getBuffer()};
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
     if (hasIndexBuffer) {
-        vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 }
 
@@ -70,32 +63,27 @@ void app::Model::createVertexBuffers(const std::vector<Vertex>& vertices)
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3");
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+    uint32_t vertexSize = sizeof(vertices[0]);
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    AppBuffer stagingBuffer{
+      appDevice,
+      vertexSize,
+      vertexCount,
+      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+    };
 
-    appDevice.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        stagingBuffer,
-        stagingBufferMemory);
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer((void*)vertices.data());
 
-    void* data;
-    vkMapMemory(appDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(appDevice.device(), stagingBufferMemory);
-
-    appDevice.createBuffer(
-        bufferSize,
+    vertexBuffer = std::make_unique<AppBuffer>(
+        appDevice,
+        vertexSize,
+        vertexCount,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        vertexBuffer,
-        vertexBufferMemory);
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    appDevice.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-    vkDestroyBuffer(appDevice.device(), stagingBuffer, nullptr);
-    vkFreeMemory(appDevice.device(), stagingBufferMemory, nullptr);
+    appDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
 
 
 }
@@ -110,32 +98,27 @@ void app::Model::createIndexBuffers(const std::vector<uint32_t>& indices)
     }
     
     VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    uint32_t indexSize = sizeof(indices[0]);
 
-    appDevice.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        stagingBuffer,
-        stagingBufferMemory);
+    AppBuffer stagingBuffer{
+      appDevice,
+      indexSize,
+      indexCount,
+      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+    };
 
-    void* data;
-    vkMapMemory(appDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(appDevice.device(), stagingBufferMemory);
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer((void*)indices.data());
 
-    appDevice.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        indexBuffer,
-        indexBufferMemory);
+    indexBuffer = std::make_unique<AppBuffer>(
+        appDevice,
+        indexSize,
+        indexCount,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    appDevice.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-    vkDestroyBuffer(appDevice.device(), stagingBuffer, nullptr);
-    vkFreeMemory(appDevice.device(), stagingBufferMemory, nullptr);
+    appDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 
 }
 
