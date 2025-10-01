@@ -2,7 +2,8 @@
 #include "AppPipeline.h"
 #include "EngineDevice.h"
 #include "GameObject.h"
-#include "Camera.h"
+#include "FrameInfo.h"
+
 #include <memory>
 #include <vector>
 #include <array>
@@ -24,7 +25,7 @@ namespace app {
 		InitialRenderSystem(const InitialRenderSystem&) = delete;
 		InitialRenderSystem& operator=(const InitialRenderSystem&) = delete;
 
-		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>&  gameObjects, const Camera &camera);
+		void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>&  gameObjects);
 
 
 	private:

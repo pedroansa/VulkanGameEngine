@@ -21,7 +21,7 @@ namespace app {
         void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
 
         KeyMappings keys{};
-        float moveSpeed{ 100.f };
+        float moveSpeed{ 1.f };
         float lookSpeed{ 1.5f };
     };
 }

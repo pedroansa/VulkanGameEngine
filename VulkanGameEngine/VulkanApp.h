@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "InitialRenderSystem.h"
 #include "KeyboardController.h"
+#include "AppBuffer.h"
+#include "FrameInfo.h"
 
 #include <chrono>
 #include <memory>
@@ -20,10 +22,6 @@
 namespace app {
 	class VulkanApp
 	{
-		struct SimplePushConstants {
-			glm::vec2 offset;
-			glm::vec2 color;
-	};
 
 	public:
 		static constexpr int WIDTH = 800;
