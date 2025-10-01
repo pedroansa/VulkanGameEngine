@@ -35,11 +35,11 @@ namespace app {
 		viewerObject.transform.rotation.y = atan2(directionToOrigin.x, directionToOrigin.z); // yaw
 		viewerObject.transform.rotation.x = asin(-directionToOrigin.y); // pitch
 		 
-		KeyboardController controler{};
-
 		auto currentTime = std::chrono::high_resolution_clock::now();
 
 		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass() };
+		KeyboardController controler{ initialRenderSystem };
+
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
 
@@ -49,6 +49,7 @@ namespace app {
 			currentTime = newTime;
 
 			controler.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTime, viewerObject);
+			controler.handleInput(appWindow.getGLFWwindow());
 			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 			float aspect = appRenderer.getAspectRatio();

@@ -6,6 +6,12 @@
 #include "Model.h"
 
 namespace app {
+
+    struct VertexInputConfig {
+        std::vector<VkVertexInputBindingDescription> bindingDescriptions;
+        std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+    };
+
 	struct PipelineConfigInfo {
 
         PipelineConfigInfo() {
@@ -80,12 +86,19 @@ namespace app {
 
 	class AppPipeline
 	{
+ 
 	public:
 		AppPipeline(EngineDevice& device,
 			const std::string& vertFilepath, 
 			const std::string& fragFilepath,
 			const PipelineConfigInfo& configInfo);
 
+        AppPipeline(EngineDevice& device,
+            const std::string& vertFilepath,
+            const std::string& fragFilepath,
+            const PipelineConfigInfo& configInfo,
+            const VertexInputConfig& vertexInputConfig);
+      
 		~AppPipeline();
 
 		AppPipeline(const AppPipeline&) = delete;
@@ -94,11 +107,20 @@ namespace app {
 
 	static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
+    // Métodos estáticos para configurar diferentes modos
+    static void wireframePipelineConfigInfo(PipelineConfigInfo& configInfo);
+    static void pointsPipelineConfigInfo(PipelineConfigInfo& configInfo);
+
+    static VertexInputConfig getSolidVertexInputConfig();
+    static VertexInputConfig getWireframeVertexInputConfig();
+    static VertexInputConfig getPointsVertexInputConfig();
+
 	private:
 		static std::vector<char> readFile(const std::string& filepath);
 		void createGraphicsPipeline(const std::string& vertFilepath, 
 			const std::string& fragFilepath,
-			const PipelineConfigInfo& configInfo);
+			const PipelineConfigInfo& configInfo,
+            const VertexInputConfig& vertexInputConfig);
 
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
@@ -106,7 +128,6 @@ namespace app {
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;
-
 	};
 }
 

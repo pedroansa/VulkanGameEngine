@@ -36,21 +36,60 @@ namespace app {
 	void InitialRenderSystem::createPipeline(VkRenderPass& renderPass)
 	{
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before layour");
-		PipelineConfigInfo pipelineConfig{};
-		AppPipeline::defaultPipelineConfigInfo(
-			pipelineConfig);
-		pipelineConfig.renderPass = renderPass;
-		pipelineConfig.pipelineLayout = pipelineLayout;
-		appPipeline = std::make_unique<AppPipeline>(
+
+		// Para pipeline sólido (original)
+		PipelineConfigInfo solidConfig{};
+		PipelineConfigInfo wireframeConfig{};
+		PipelineConfigInfo pointConfig{};
+
+		AppPipeline::defaultPipelineConfigInfo(solidConfig);
+		auto solidVertexInput = AppPipeline::getSolidVertexInputConfig();
+		solidConfig.renderPass = renderPass;
+		solidConfig.pipelineLayout = pipelineLayout;
+		solidPipeline = std::make_unique<AppPipeline>(
 			engineDevice,
-			"shaders/vert.spv",
-			"shaders/frag.spv",
-			pipelineConfig);
+			"shaders/SOLID/vert.spv",
+			"shaders/SOLID/frag.spv",
+			solidConfig, solidVertexInput);
+
+		//Para wireframe
+		AppPipeline::wireframePipelineConfigInfo(wireframeConfig);
+		auto wireFrameVertexInput = AppPipeline::getWireframeVertexInputConfig();
+		wireframeConfig.renderPass = renderPass;
+		wireframeConfig.pipelineLayout = pipelineLayout;
+		wireframePipeline = std::make_unique<AppPipeline>(
+			engineDevice,
+			"shaders/WIREFRAME/vert.spv",
+			"shaders/WIREFRAME/frag.spv",
+			wireframeConfig, wireFrameVertexInput);
+
+		//// Para pontos
+		AppPipeline::pointsPipelineConfigInfo(pointConfig);
+		auto pointsVertexInput = AppPipeline::getPointsVertexInputConfig();
+		pointConfig.renderPass = renderPass;
+		pointConfig.pipelineLayout = pipelineLayout;
+		pointsPipeline = std::make_unique<AppPipeline>(
+			engineDevice,
+			"shaders/POINTS/vert.spv",
+			"shaders/POINTS/frag.spv",
+			pointConfig, pointsVertexInput);
 	}
 	void InitialRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects)
 	{
+
+		switch (pipelineMode) {
+		case PipelineMode::SOLID:
+			solidPipeline->bind(frameInfo.commandBuffer);
+			break;
+		case PipelineMode::WIREFRAME:
+			wireframePipeline->bind(frameInfo.commandBuffer);
+			break;
+		case PipelineMode::POINTS:
+			pointsPipeline->bind(frameInfo.commandBuffer);
+			break;
+		}
+
 		// Render
-		appPipeline->bind(frameInfo.commandBuffer);
 		auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();
 
 		for (auto& obj : gameObjects) {
@@ -76,4 +115,5 @@ namespace app {
 
 		}
 	}
+
 }

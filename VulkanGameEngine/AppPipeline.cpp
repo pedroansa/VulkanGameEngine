@@ -3,12 +3,19 @@
 #include <iostream>
 
 namespace app {
-	AppPipeline::AppPipeline(EngineDevice& device, 
-		const std::string& vertFilepath, 
+	AppPipeline::AppPipeline(EngineDevice& device,
+		const std::string& vertFilepath,
 		const std::string& fragFilepath,
-		const PipelineConfigInfo& configInfo) : appDevice{device}
+		const PipelineConfigInfo& configInfo) : appDevice{ device }
 	{
-		createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
+		auto defaultVertexInput = getSolidVertexInputConfig();
+		createGraphicsPipeline(vertFilepath, fragFilepath, configInfo, defaultVertexInput);
+	}
+
+	AppPipeline::AppPipeline(EngineDevice& device, const std::string& vertFilepath, const std::string& fragFilepath,
+		const PipelineConfigInfo& configInfo, const VertexInputConfig& vertexInputConfig) : appDevice{ device }
+	{
+		createGraphicsPipeline(vertFilepath, fragFilepath, configInfo, vertexInputConfig);
 	}
 
 	AppPipeline::~AppPipeline()
@@ -106,9 +113,10 @@ namespace app {
 		return buffer;
 	}
 
-	void AppPipeline::createGraphicsPipeline(const std::string& vertFilepath, 
+	void AppPipeline::createGraphicsPipeline(const std::string& vertFilepath,
 		const std::string& fragFilepath,
-		const PipelineConfigInfo& configInfo)
+		const PipelineConfigInfo& configInfo, 
+		const VertexInputConfig& vertexInputConfig)
 	{
 		assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 		assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
@@ -136,14 +144,16 @@ namespace app {
 		shaderStages[1].pNext = nullptr;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
-		auto bidingDescriptions = Model::Vertex::getBindingDescriptions();
-		auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+		/*auto bidingDescriptions = Model::Vertex::getBindingDescriptions();
+		auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();*/
+
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
-		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bidingDescriptions.size());
-		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-		vertexInputInfo.pVertexBindingDescriptions = bidingDescriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexInputConfig.attributeDescriptions.size());;
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexInputConfig.bindingDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = vertexInputConfig.attributeDescriptions.data();
+		vertexInputInfo.pVertexBindingDescriptions = vertexInputConfig.bindingDescriptions.data();
+
 
 		VkPipelineViewportStateCreateInfo viewportInfo{};
 		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -193,5 +203,62 @@ namespace app {
 			throw std::runtime_error("failed to create shader module");
 		}
 
+	}
+
+	void AppPipeline::wireframePipelineConfigInfo(PipelineConfigInfo& configInfo)
+	{
+		// Primeiro configure como padrão
+		defaultPipelineConfigInfo(configInfo);
+
+		// Agora modifique para wireframe
+		configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
+		configInfo.rasterizationInfo.lineWidth = 1.0f;
+		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+		// Para wireframe, geralmente desabilitamos o culling para ver todas as arestas
+		configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+	}
+
+	void AppPipeline::pointsPipelineConfigInfo(PipelineConfigInfo& configInfo)
+	{
+		// Primeiro configure como padrão
+		defaultPipelineConfigInfo(configInfo);
+
+		// Modifique para pontos
+		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+		configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+
+		// Para pontos, desabilitamos culling
+		configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+	}
+
+	VertexInputConfig AppPipeline::getSolidVertexInputConfig() {
+		VertexInputConfig config;
+		config.bindingDescriptions = Model::Vertex::getBindingDescriptions();
+		config.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+		return config;
+	}
+
+	VertexInputConfig AppPipeline::getWireframeVertexInputConfig() {
+		VertexInputConfig config;
+
+		// Apenas 1 binding description
+		config.bindingDescriptions = {
+			{0, sizeof(Model::Vertex), VK_VERTEX_INPUT_RATE_VERTEX}
+		};
+
+		// Apenas position (location 0) e color (location 1)
+		config.attributeDescriptions = {
+			{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Model::Vertex, position)},
+			{1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Model::Vertex, color)}
+			// Não inclui normal (location 2) e uv (location 3)
+		};
+
+		return config;
+	}
+
+	VertexInputConfig AppPipeline::getPointsVertexInputConfig() {
+		// Pode usar a mesma configuração do wireframe
+		return getWireframeVertexInputConfig();
 	}
 }

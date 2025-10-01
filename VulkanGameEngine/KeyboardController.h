@@ -1,6 +1,10 @@
 #pragma once
 #include "AppWindow.h"
+#include "InitialRenderSystem.h"
 #include "GameObject.h"
+
+#include <iostream>
+
 namespace app {
     class KeyboardController
     {
@@ -16,13 +20,23 @@ namespace app {
             int lookRight = GLFW_KEY_RIGHT;
             int lookUp = GLFW_KEY_UP;
             int lookDown = GLFW_KEY_DOWN;
+
+            // Pipeline mode controler
+            int solidShader = GLFW_KEY_1;
+            int wireframeShader = GLFW_KEY_2;
+            int pointShader = GLFW_KEY_3;
         };
 
+        KeyboardController(InitialRenderSystem& renderSystem) : renderSystem(renderSystem) {}
+
         void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
+        void handleInput(GLFWwindow* window);
 
         KeyMappings keys{};
         float moveSpeed{ 1.f };
         float lookSpeed{ 1.5f };
+
+        InitialRenderSystem& renderSystem;
     };
 }
 
