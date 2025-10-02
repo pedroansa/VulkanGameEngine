@@ -82,7 +82,7 @@ namespace app {
 				// Update memory
 				GlobalUbo ubo{};
 				ubo.projectionViewMatrix = camera.getProjection() * camera.getView();
-				uboBuffers[frameIndex]->writeToIndex(&ubo, frameIndex);
+				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
 				// Render
