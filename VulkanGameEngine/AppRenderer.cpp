@@ -38,8 +38,12 @@ namespace app {
 
 	void AppRenderer::recreateSwapChain()
 	{
+		// We need to improve this part (alerta gambiarra)
+		int width = 0, height = 0;
+		glfwGetFramebufferSize(appWindow.getGLFWwindow(), &width, &height);
 		auto extent = appWindow.getExtent();
-		while (extent.width == 0 || extent.height == 0) {
+		while (width == 0 || height == 0 || appWindow.isMinimized()) {
+			glfwGetFramebufferSize(appWindow.getGLFWwindow(), &width, &height);
 			extent = appWindow.getExtent();
 			glfwWaitEvents();
 		}

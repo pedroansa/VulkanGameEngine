@@ -32,6 +32,14 @@ namespace app{
 		appWindow->height = height;
 	}
 
+	void AppWindow::windowIconifyCallback(GLFWwindow* window, int iconified)
+	{
+		auto appWindow = reinterpret_cast<AppWindow*>(glfwGetWindowUserPointer(window));
+		appWindow->minimized = iconified; // Track minimization state
+		appWindow->frameBufferResized = true; // Still mark as resized
+	}
+
+
 	void AppWindow::initWindow() {
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -40,6 +48,7 @@ namespace app{
 		window = glfwCreateWindow(width, height, windowname.c_str(), nullptr, nullptr);
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+		glfwSetWindowIconifyCallback(window, windowIconifyCallback);
 	}
 }
 
