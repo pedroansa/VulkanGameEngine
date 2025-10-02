@@ -5,8 +5,10 @@
 namespace app {
 
 	struct GlobalUbo {
-		glm::mat4 projectionViewMatrix{ 1.f };
-		glm::vec3 lightDirection = glm::normalize(glm::vec3{ -1.f, -3.f, -1.f });
+		glm::mat4 projectionView{ 1.f };
+		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f };  // w is intensity
+		glm::vec3 lightPosition{ -1.f };
+		alignas(16) glm::vec4 lightColor{ 1.f , 0.f, 0.f, 1.f};  // w is light intensity
 	};
 
 	VulkanApp::VulkanApp()
@@ -81,7 +83,7 @@ namespace app {
 
 				// Update memory
 				GlobalUbo ubo{};
-				ubo.projectionViewMatrix = camera.getProjection() * camera.getView();
+				ubo.projectionView = camera.getProjection() * camera.getView();
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
@@ -155,6 +157,13 @@ namespace app {
 		flat_vase.transform.translation = { 0.0f, .0f, 0.0f };
 		flat_vase.transform.scale = { 1.f, 1.f, 1.f };
 		gameObjects.push_back(std::move(flat_vase));
+
+		model = Model::createModelFromFile(engineDevice, "models/quad.obj");
+		auto floor = GameObject::createGameObject();
+		floor.model = model;
+		floor.transform.translation = { 0.f, .5f, 0.f };
+		floor.transform.scale = { 3.f, 1.f, 3.f };
+		gameObjects.push_back(std::move(floor));
 	}
 
 }
