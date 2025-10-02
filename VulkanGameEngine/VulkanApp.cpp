@@ -6,7 +6,7 @@ namespace app {
 
 	struct GlobalUbo {
 		glm::mat4 projectionViewMatrix{ 1.f };
-		glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+		glm::vec3 lightDirection = glm::normalize(glm::vec3{ -1.f, -3.f, -1.f });
 	};
 
 	VulkanApp::VulkanApp()
