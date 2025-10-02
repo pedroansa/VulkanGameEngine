@@ -8,6 +8,7 @@
 #include "KeyboardController.h"
 #include "AppBuffer.h"
 #include "FrameInfo.h"
+#include "AppDescriptor.h"
 
 #include <chrono>
 #include <memory>
@@ -47,6 +48,8 @@ namespace app {
 		EngineDevice engineDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, engineDevice };
 
+
+		std::unique_ptr<AppDescriptorPool> globalPool{};
 		std::vector<GameObject> gameObjects;
 	};
 }

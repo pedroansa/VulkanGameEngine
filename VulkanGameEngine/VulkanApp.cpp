@@ -5,12 +5,17 @@
 namespace app {
 
 	struct GlobalUbo {
-		glm::mat4 projectionView{ 1.f };
+		glm::mat4 projectionViewMatrix{ 1.f };
 		glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
 	};
 
 	VulkanApp::VulkanApp()
 	{
+		globalPool = 
+			AppDescriptorPool::Builder(engineDevice)
+			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.build();
 		loadGameObjects();
 	}
 
@@ -19,6 +24,7 @@ namespace app {
 	void VulkanApp::run()
 	{
 		std::vector<std::unique_ptr<AppBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
+
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = std::make_unique<AppBuffer>(engineDevice,
 				sizeof(GlobalUbo),
@@ -26,6 +32,19 @@ namespace app {
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 			uboBuffers[i]->map();
+		}
+
+		auto globalSetLayout =
+			AppDescriptorSetLayout::Builder(engineDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.build();
+		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
+
+		for (int i = 0; i < globalDescriptorSets.size(); i++) {
+			auto bufferInfo = uboBuffers[i]->descriptorInfo();
+			AppDescriptorWriter(*globalSetLayout, *globalPool)
+				.writeBuffer(0, &bufferInfo)
+				.build(globalDescriptorSets[i]);
 		}
 
 		Camera camera{};
@@ -37,7 +56,7 @@ namespace app {
 		 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 
-		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass() };
+		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
 		KeyboardController controler{ initialRenderSystem };
 
 		while (!appWindow.shouldClose()) {
@@ -58,11 +77,11 @@ namespace app {
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
 				int frameIndex = appRenderer.getCurrentFrameIndex();
-				FrameInfo frameInfo{ frameIndex, frameTime, commandBuffer, camera };
+				FrameInfo frameInfo{ frameIndex, frameTime, commandBuffer, camera,  globalDescriptorSets[frameIndex] };
 
 				// Update memory
 				GlobalUbo ubo{};
-				ubo.projectionView = camera.getProjection() * camera.getView();
+				ubo.projectionViewMatrix = camera.getProjection() * camera.getView();
 				uboBuffers[frameIndex]->writeToIndex(&ubo, frameIndex);
 				uboBuffers[frameIndex]->flush();
 
