@@ -35,4 +35,21 @@ namespace app {
             gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
         }
     }
+    void KeyboardController::handleInput(GLFWwindow* window)
+    {
+       
+        if (!(renderSystem.getMode() == PipelineMode::SOLID) && glfwGetKey(window, keys.solidShader) == GLFW_PRESS) {
+            std::cout << "Switched to SOLID mode\n";
+            renderSystem.changeMode(PipelineMode::SOLID);
+        }
+        if (!(renderSystem.getMode() == PipelineMode::WIREFRAME) && glfwGetKey(window, keys.wireframeShader) == GLFW_PRESS) {
+            std::cout << "Switched to WIREFRAME mode\n";
+            renderSystem.changeMode(PipelineMode::WIREFRAME);
+        }
+        if (!(renderSystem.getMode() == PipelineMode::POINTS) && glfwGetKey(window, keys.pointShader) == GLFW_PRESS) {
+            std::cout << "Switched to POINTS mode\n";
+            renderSystem.changeMode(PipelineMode::POINTS);
+        }
+     
+    }
 }

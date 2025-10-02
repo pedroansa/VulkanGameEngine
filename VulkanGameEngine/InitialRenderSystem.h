@@ -9,6 +9,14 @@
 #include <array>
 
 namespace app {
+
+	// Enum para modos de renderização
+	enum class PipelineMode {
+		SOLID,
+		WIREFRAME,
+		POINTS
+	};
+
 	class InitialRenderSystem
 	{
 		struct SimplePushConstantData {
@@ -26,6 +34,8 @@ namespace app {
 		InitialRenderSystem& operator=(const InitialRenderSystem&) = delete;
 
 		void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>&  gameObjects);
+		void changeMode(PipelineMode mode) { pipelineMode = mode; };
+		PipelineMode getMode() { return pipelineMode; };
 
 
 	private:
@@ -37,6 +47,12 @@ namespace app {
 
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
+
+		std::unique_ptr<AppPipeline> solidPipeline;
+		std::unique_ptr<AppPipeline> wireframePipeline;
+		std::unique_ptr<AppPipeline> pointsPipeline;
+
+		PipelineMode pipelineMode = PipelineMode::SOLID;
 	};
 }
 
