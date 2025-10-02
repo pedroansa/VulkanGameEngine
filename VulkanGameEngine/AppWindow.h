@@ -20,13 +20,18 @@ namespace app {
 
 		bool shouldClose();
 		bool wasWindowResized() { return frameBufferResized; };
+		bool isMinimized() const { return minimized; }
+
 		void resetWindowResizedFlag() { frameBufferResized = false; };
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 	private:
 		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+		static void windowIconifyCallback(GLFWwindow* window, int iconified);
 		void initWindow();
 		int width, height;
 		bool frameBufferResized = false;
+		bool minimized = false;
+
 		
 		std::string windowname;
 		GLFWwindow* window;
