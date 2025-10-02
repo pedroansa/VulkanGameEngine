@@ -10,5 +10,6 @@ namespace app{
 		VkCommandBuffer commandBuffer;
 		Camera& camera;
 		VkDescriptorSet globalDescriptorSet;
+		GameObject::Map& gameObjects;
 	};
 }

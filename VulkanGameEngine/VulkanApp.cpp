@@ -8,7 +8,7 @@ namespace app {
 		glm::mat4 projectionView{ 1.f };
 		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f };  // w is intensity
 		glm::vec3 lightPosition{ -1.f };
-		alignas(16) glm::vec4 lightColor{ 1.f , 1.f, 1.f, 1.f};  // w is light intensity
+		alignas(16) glm::vec4 lightColor{ 1.f , 0.f, 0.f, 1.f};  // w is light intensity
 	};
 
 	VulkanApp::VulkanApp()
@@ -79,7 +79,7 @@ namespace app {
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
 				int frameIndex = appRenderer.getCurrentFrameIndex();
-				FrameInfo frameInfo{ frameIndex, frameTime, commandBuffer, camera,  globalDescriptorSets[frameIndex] };
+				FrameInfo frameInfo{ frameIndex, frameTime, commandBuffer, camera,  globalDescriptorSets[frameIndex], gameObjects };
 
 				// Update memory
 				GlobalUbo ubo{};
@@ -89,7 +89,7 @@ namespace app {
 
 				// Render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
-				initialRenderSystem.renderGameObjects(frameInfo, gameObjects);
+				initialRenderSystem.renderGameObjects(frameInfo);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 
@@ -156,14 +156,14 @@ namespace app {
 		flat_vase.model = model;
 		flat_vase.transform.translation = { 0.0f, .0f, 0.0f };
 		flat_vase.transform.scale = { 1.f, 1.f, 1.f };
-		gameObjects.push_back(std::move(flat_vase));
+		gameObjects.emplace(flat_vase.getId(), std::move(flat_vase));
 
 		model = Model::createModelFromFile(engineDevice, "models/quad.obj");
 		auto floor = GameObject::createGameObject();
 		floor.model = model;
 		floor.transform.translation = { 0.f, .5f, 0.f };
 		floor.transform.scale = { 3.f, 1.f, 3.f };
-		gameObjects.push_back(std::move(floor));
+		gameObjects.emplace(floor.getId(), std::move(floor));
 	}
 
 }

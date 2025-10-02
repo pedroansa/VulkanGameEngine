@@ -33,7 +33,7 @@ namespace app {
 		InitialRenderSystem(const InitialRenderSystem&) = delete;
 		InitialRenderSystem& operator=(const InitialRenderSystem&) = delete;
 
-		void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>&  gameObjects);
+		void renderGameObjects(FrameInfo& frameInfo);
 		void changeMode(PipelineMode mode) { pipelineMode = mode; };
 		PipelineMode getMode() { return pipelineMode; };
 

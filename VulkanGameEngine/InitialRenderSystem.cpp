@@ -77,7 +77,7 @@ namespace app {
 			"shaders/POINTS/frag.spv",
 			pointConfig, pointsVertexInput);
 	}
-	void InitialRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects)
+	void InitialRenderSystem::renderGameObjects(FrameInfo& frameInfo)
 	{
 
 		switch (pipelineMode) {
@@ -105,7 +105,10 @@ namespace app {
 		// Render
 		//auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();
 
-		for (auto& obj : gameObjects) {
+		for (auto& kv : frameInfo.gameObjects) {
+			auto& obj = kv.second;
+			if (obj.model == nullptr) continue;
+
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform.mat4();
 			push.normalMatrix = obj.transform.normalMatrix();

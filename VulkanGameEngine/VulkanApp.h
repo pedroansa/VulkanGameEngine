@@ -50,7 +50,7 @@ namespace app {
 
 
 		std::unique_ptr<AppDescriptorPool> globalPool{};
-		std::vector<GameObject> gameObjects;
+		GameObject::Map gameObjects;
 	};
 }
 
