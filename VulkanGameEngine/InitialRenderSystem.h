@@ -20,14 +20,14 @@ namespace app {
 	class InitialRenderSystem
 	{
 		struct SimplePushConstantData {
-			glm::mat4 transform{ 1.f };
+			glm::mat4 modelMatrix{ 1.f };
 			glm::mat4 normalMatrix{ 1.f };
 		};
 
 
 	public: 
 
-		InitialRenderSystem(EngineDevice& device, VkRenderPass renderPass);
+		InitialRenderSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~InitialRenderSystem();
 
 		InitialRenderSystem(const InitialRenderSystem&) = delete;
@@ -40,7 +40,7 @@ namespace app {
 
 	private:
 
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass& renderPass);
 
 		EngineDevice& engineDevice;
