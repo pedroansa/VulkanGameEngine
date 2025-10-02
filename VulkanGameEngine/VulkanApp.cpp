@@ -8,7 +8,7 @@ namespace app {
 		glm::mat4 projectionView{ 1.f };
 		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f };  // w is intensity
 		glm::vec3 lightPosition{ -1.f };
-		alignas(16) glm::vec4 lightColor{ 1.f , 0.f, 0.f, 1.f};  // w is light intensity
+		alignas(16) glm::vec4 lightColor{ 1.f , 1.f, 1.f, 1.f};  // w is light intensity
 	};
 
 	VulkanApp::VulkanApp()
@@ -38,7 +38,7 @@ namespace app {
 
 		auto globalSetLayout =
 			AppDescriptorSetLayout::Builder(engineDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 			.build();
 		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 
