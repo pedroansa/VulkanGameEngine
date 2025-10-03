@@ -8,6 +8,8 @@
 x64/
 Debug/
 Release/
+build/
+libs/
 
 # Arquivos temporários
 *.obj
