@@ -8,6 +8,10 @@
 #include <glm/gtx/hash.hpp>
 #include <unordered_map>
 
+#ifndef ENGINE_DIR
+#define ENGINE_DIR "../"
+#endif
+
 namespace std {
     template <>
     struct hash<app::Model::Vertex> {
@@ -32,7 +36,7 @@ app::Model::~Model()
 std::unique_ptr<app::Model> app::Model::createModelFromFile(EngineDevice& device, const std::string& filePath)
 {
     ModelBuilder builder{};
-    builder.loadModel(filePath);
+    builder.loadModel(ENGINE_DIR + filePath);
     std::cout << "Vertex count: " << builder.vertices.size() << "\n";
     return std::make_unique<Model>(device, builder);
 }

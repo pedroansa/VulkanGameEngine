@@ -1,5 +1,6 @@
 # Pasta do Visual Studio
 .vs/
+.vscode/
 
 # Arquivos de solução
 *.sln
@@ -8,6 +9,8 @@
 x64/
 Debug/
 Release/
+build/
+libs/
 
 # Arquivos temporários
 *.obj
