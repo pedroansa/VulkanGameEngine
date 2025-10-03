@@ -54,14 +54,6 @@ else()
 	message(STATUS "Using glfw lib at: ${GLFW_LIB}")
 endif()
 
-include_directories(external)
-
-# If TINYOBJ_PATH not specified in .env.cmake, try fetching from git repo
-if (NOT TINYOBJ_PATH)
-  message(STATUS "TINYOBJ_PATH not specified in .env.cmake, using external/tinyobjloader")
-  set(TINYOBJ_PATH external/tinyobjloader)
-endif()
-
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 source_group(TREE ${PROJECT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${SOURCES})
@@ -131,11 +123,6 @@ endif()
 
 ############## Build SHADERS #######################
 
-# Find all vertex and fragment sources within shaders directory
-# taken from VBlancos vulkan tutorial
-# https://github.com/vblanco20-1/vulkan-guide/blob/all-chapters/CMakeLists.txt
-############## Build SHADERS #######################
-
 # Find glslangValidator
 find_program(GLSL_VALIDATOR glslangValidator HINTS 
   ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} 
@@ -151,49 +138,59 @@ if(NOT GLSL_VALIDATOR)
     message(WARNING "glslangValidator not found - shaders will not be compiled")
 else()
     message(STATUS "Found glslangValidator: ${GLSL_VALIDATOR}")
-endif()
-
-# Create a directory for compiled shaders
-set(SHADER_OUTPUT_DIR "${PROJECT_SOURCE_DIR}/Shaders/compiled")
-file(MAKE_DIRECTORY ${SHADER_OUTPUT_DIR})
-
-# Clear the list
-set(SPIRV_BINARY_FILES)
-
-# get all .vert and .frag files in shaders directory
-file(GLOB_RECURSE GLSL_SOURCE_FILES
-  "${PROJECT_SOURCE_DIR}/Shaders/*.frag"
-  "${PROJECT_SOURCE_DIR}/Shaders/*.vert"
-)
-
-foreach(GLSL ${GLSL_SOURCE_FILES})
-  # Get the directory name and filename
-  get_filename_component(SHADER_DIR ${GLSL} DIRECTORY)
-  get_filename_component(SHADER_NAME ${GLSL} NAME_WE)
-  get_filename_component(SHADER_EXT ${GLSL} EXT)
-  
-  # Get just the immediate parent directory name (POINTS, WIREFRAME, SOLID)
-  get_filename_component(PARENT_DIR ${SHADER_DIR} NAME)
-  
-  # Create unique output filename using parent directory
-  set(SPIRV "${SHADER_OUTPUT_DIR}/${PARENT_DIR}_${SHADER_NAME}${SHADER_EXT}.spv")
-  
-  message(STATUS "Shader: ${GLSL} -> ${SPIRV}")
-  
-  add_custom_command(
-    OUTPUT ${SPIRV}
-    COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
-    DEPENDS ${GLSL}
-    COMMENT "Compiling shader: ${PARENT_DIR}/${SHADER_NAME}${SHADER_EXT}"
-    VERBATIM
-  )
-  list(APPEND SPIRV_BINARY_FILES ${SPIRV})
-endforeach()
-
-# Only add the target if we have shaders to compile
-if(SPIRV_BINARY_FILES AND GLSL_VALIDATOR)
-    add_custom_target(
-        Shaders
-        DEPENDS ${SPIRV_BINARY_FILES}
+    
+    # Create a directory for compiled shaders
+    set(SHADER_OUTPUT_DIR "${PROJECT_SOURCE_DIR}/Shaders/compiled")
+    file(MAKE_DIRECTORY ${SHADER_OUTPUT_DIR})
+    
+    set(SPIRV_BINARY_FILES)
+    file(GLOB_RECURSE GLSL_SOURCE_FILES
+      "${PROJECT_SOURCE_DIR}/Shaders/*.frag"
+      "${PROJECT_SOURCE_DIR}/Shaders/*.vert"
     )
+
+    foreach(GLSL ${GLSL_SOURCE_FILES})
+        get_filename_component(SHADER_DIR ${GLSL} DIRECTORY)
+        get_filename_component(SHADER_NAME ${GLSL} NAME_WE)
+        get_filename_component(SHADER_EXT ${GLSL} EXT)
+        get_filename_component(PARENT_DIR ${SHADER_DIR} NAME)
+        
+        set(SPIRV "${SHADER_OUTPUT_DIR}/${PARENT_DIR}_${SHADER_NAME}${SHADER_EXT}.spv")
+        
+        message(STATUS "Shader: ${GLSL} -> ${SPIRV}")
+        
+        add_custom_command(
+            OUTPUT ${SPIRV}
+            COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
+            DEPENDS ${GLSL}
+            COMMENT "Compiling shader: ${PARENT_DIR}/${SHADER_NAME}${SHADER_EXT}"
+            VERBATIM
+        )
+        list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+    endforeach()
+
+    if(SPIRV_BINARY_FILES)
+        add_custom_target(
+            Shaders ALL  # Added ALL to ensure it builds by default
+            DEPENDS ${SPIRV_BINARY_FILES}
+        )
+        
+        # Critical: Make main target depend on shaders
+        add_dependencies(${PROJECT_NAME} Shaders)
+        
+        # Copy shaders to build directory
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory 
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders/compiled"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${SHADER_OUTPUT_DIR}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders/compiled"
+            COMMENT "Copying compiled shaders to build directory"
+        )
+        
+        # Add shader directory as a compile definition for runtime path resolution
+        target_compile_definitions(${PROJECT_NAME} PRIVATE
+            SHADER_DIR="${SHADER_OUTPUT_DIR}"
+        )
+    endif()
 endif()
