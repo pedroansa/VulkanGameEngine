@@ -44,7 +44,7 @@ namespace app {
 			glm::vec2 right,
 			glm::vec2 top);
 
-		AppWindow appWindow{ WIDTH, HEIGHT, "Vulkan Game Engine" };
+		AppWindow appWindow{ WIDTH, HEIGHT, "RELAMPIAO Engine" };
 		EngineDevice engineDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, engineDevice };
 
