@@ -33,3 +33,4 @@ obj/
 *.vcxproj.filters
 
 *.spv
+*.cmake

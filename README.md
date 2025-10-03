@@ -1,4 +1,4 @@
-# AmatiriENGINE
+# RELAMPIÂO
 
 ![Engine Screenshot](screenshot.png)
 
@@ -158,11 +158,3 @@ This project was developed following tutorials and resources from:
 - [Vulkan Tutorial](https://vulkan-tutorial.com)
 
 *Note: This is an educational project focused on learning Vulkan graphics programming.*
-
----
-
-**Fluxo de trabalho correto:**
-1. `cmake -S ../ -B .` para gerar a solution do Visual Studio
-2. Abrir `VulkanGameEngine.sln` no Visual Studio
-3. Compilar com F7 (Build Solution)
-4. Executar com F5 (Start Debugging)
