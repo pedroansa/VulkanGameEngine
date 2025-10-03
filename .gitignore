@@ -1,5 +1,6 @@
 # Pasta do Visual Studio
 .vs/
+.vscode/
 
 # Arquivos de solução
 *.sln
