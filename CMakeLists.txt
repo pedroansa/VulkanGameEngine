@@ -61,12 +61,6 @@ file(GLOB_RECURSE HEADER_FILES
     "${PROJECT_SOURCE_DIR}/src/Headers/*.hpp"
     "${PROJECT_SOURCE_DIR}/src/Headers/*.h"
 )
-
-# Organize header files
-file(GLOB_RECURSE HEADER_FILES 
-    "${PROJECT_SOURCE_DIR}/src/Headers/*.hpp"
-    "${PROJECT_SOURCE_DIR}/src/Headers/*.h"
-)
 source_group(TREE ${PROJECT_SOURCE_DIR}/src PREFIX "Header Files" FILES ${HEADER_FILES})
 
 file(GLOB_RECURSE SHADER_FILES
@@ -80,7 +74,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_sources(${PROJECT_NAME} PRIVATE ${HEADER_FILES} ${SHADER_FILES})
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
 
