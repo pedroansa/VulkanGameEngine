@@ -1,7 +1,9 @@
 #include "AppRenderer.h"
 
 namespace app {
-	AppRenderer::AppRenderer(AppWindow& window, EngineDevice& device) : appWindow{window}, engineDevice{device}
+	AppRenderer::AppRenderer(AppWindow& window, EngineDevice& device) : appWindow{window}, engineDevice{device}, currentImageIndex(0),        // INICIALIZAR
+		currentFrameIndex(0),        // INICIALIZAR  
+		isFrameStarted(false)        // INICIALIZAR
 	{
 		recreateSwapChain();
 		createCommandBuffer();
