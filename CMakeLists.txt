@@ -149,8 +149,8 @@ else()
         get_filename_component(SHADER_EXT ${GLSL} EXT)
         get_filename_component(PARENT_DIR ${SHADER_DIR} NAME)
         
-        set(SPIRV "${SHADER_OUTPUT_DIR}/${PARENT_DIR}_${SHADER_NAME}${SHADER_EXT}.spv")
-        
+        set(SPIRV "${SHADER_DIR}/${SHADER_NAME}${SHADER_EXT}.spv")
+                
         message(STATUS "Shader: ${GLSL} -> ${SPIRV}")
         
         add_custom_command(
