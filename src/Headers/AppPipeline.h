@@ -128,6 +128,8 @@ namespace app {
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;
+
+
 	};
 }
 

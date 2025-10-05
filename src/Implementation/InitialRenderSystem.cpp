@@ -51,8 +51,8 @@ namespace app {
 		solidConfig.pipelineLayout = pipelineLayout;
 		solidPipeline = std::make_unique<AppPipeline>(
 			engineDevice,
-			"shaders/SOLID/vert.spv",
-			"shaders/SOLID/frag.spv",
+			"shaders/SOLID/shader.vert.spv",
+			"shaders/SOLID/shader.frag.spv",
 			solidConfig, solidVertexInput);
 
 		//Para wireframe
@@ -62,8 +62,8 @@ namespace app {
 		wireframeConfig.pipelineLayout = pipelineLayout;
 		wireframePipeline = std::make_unique<AppPipeline>(
 			engineDevice,
-			"shaders/WIREFRAME/vert.spv",
-			"shaders/WIREFRAME/frag.spv",
+			"shaders/WIREFRAME/shader.vert.spv",
+			"shaders/WIREFRAME/shader.frag.spv",
 			wireframeConfig, wireFrameVertexInput);
 
 		//// Para pontos
@@ -73,8 +73,8 @@ namespace app {
 		pointConfig.pipelineLayout = pipelineLayout;
 		pointsPipeline = std::make_unique<AppPipeline>(
 			engineDevice,
-			"shaders/POINTS/vert.spv",
-			"shaders/POINTS/frag.spv",
+			"shaders/POINTS/shader.vert.spv",
+			"shaders/POINTS/shader.frag.spv",
 			pointConfig, pointsVertexInput);
 	}
 	void InitialRenderSystem::renderGameObjects(FrameInfo& frameInfo)

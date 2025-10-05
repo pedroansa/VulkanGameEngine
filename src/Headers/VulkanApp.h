@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "InitialRenderSystem.h"
+#include "PointLightSystem.h"
 #include "KeyboardController.h"
 #include "AppBuffer.h"
 #include "FrameInfo.h"

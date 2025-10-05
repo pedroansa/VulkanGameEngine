@@ -5,7 +5,8 @@
 namespace app {
 
 	struct GlobalUbo {
-		glm::mat4 projectionView{ 1.f };
+		glm::mat4 projection{ 1.f };
+		glm::mat4 view{ 1.f };
 		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f };  // w is intensity
 		glm::vec3 lightPosition{ -1.f };
 		alignas(16) glm::vec4 lightColor{ 1.f , 0.f, 0.f, 1.f};  // w is light intensity
@@ -59,6 +60,7 @@ namespace app {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 
 		InitialRenderSystem initialRenderSystem{ engineDevice, appRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+		PointLightSystem pointLightSystem{ engineDevice, appRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		KeyboardController controler{ initialRenderSystem };
 
 		while (!appWindow.shouldClose()) {
@@ -83,13 +85,15 @@ namespace app {
 
 				// Update memory
 				GlobalUbo ubo{};
-				ubo.projectionView = camera.getProjection() * camera.getView();
+				ubo.projection = camera.getProjection();
+				ubo.view = camera.getView();
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
 				// Render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
 				initialRenderSystem.renderGameObjects(frameInfo);
+				pointLightSystem.render(frameInfo);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 
@@ -151,11 +155,11 @@ namespace app {
 
 	void VulkanApp::loadGameObjects()
 	{
-		std::shared_ptr<Model> model = Model::createModelFromFile(engineDevice, "models/smooth_vase.obj");
+		std::shared_ptr<Model> model = Model::createModelFromFile(engineDevice, "models/face.obj");
 		auto flat_vase = GameObject::createGameObject();
 		flat_vase.model = model;
 		flat_vase.transform.translation = { 0.0f, .0f, 0.0f };
-		flat_vase.transform.scale = { 1.f, 1.f, 1.f };
+		flat_vase.transform.scale = { 0.008f, 0.008f, 0.008f };
 		gameObjects.emplace(flat_vase.getId(), std::move(flat_vase));
 
 		model = Model::createModelFromFile(engineDevice, "models/quad.obj");
