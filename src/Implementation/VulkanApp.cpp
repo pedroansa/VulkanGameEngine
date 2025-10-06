@@ -159,7 +159,8 @@ namespace app {
 		auto flat_vase = GameObject::createGameObject();
 		flat_vase.model = model;
 		flat_vase.transform.translation = { 0.0f, .0f, 0.0f };
-		flat_vase.transform.scale = { 0.008f, 0.008f, 0.008f };
+		flat_vase.transform.scale = { 0.1f, 0.1f, 0.1f };
+		flat_vase.transform.rotation = { 1.5f , 1.5f, 0.0f };
 		gameObjects.emplace(flat_vase.getId(), std::move(flat_vase));
 
 		model = Model::createModelFromFile(engineDevice, "models/quad.obj");

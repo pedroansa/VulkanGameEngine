@@ -110,6 +110,8 @@ namespace app {
 			if (obj.model == nullptr) continue;
 
 			SimplePushConstantData push{};
+			// rotate
+			//obj.transform.rotation.y += 0.1f * frameInfo.frameTime;
 			push.modelMatrix = obj.transform.mat4();
 			push.normalMatrix = obj.transform.normalMatrix();
 
